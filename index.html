@@ -3,371 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전략 보고서: 라코스테 온라인 판매 최적화</title>
+    <title>전략 보고서 & 설계도: 라코스테 상세페이지 최적화</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* === 공통 스타일 === */
         :root {
-            --primary: #004526; /* Lacoste Green vibe but darker for business */
-            --secondary: #2c3e50;
-            --accent: #c0392b; /* Alert Red */
-            --bg: #f8f9fa;
-            --white: #ffffff;
-            --text-gray: #666;
+            --primary: #004526; --secondary: #2c3e50; --accent: #c0392b; --bg: #f8f9fa; --white: #ffffff; --text-gray: #666;
+            --wf-border: #aaa; --wf-bg: #e0e0e0;
         }
-
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            background: var(--white);
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            min-height: 100vh;
-        }
-
-        /* Header Area */
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 40px 25px;
-            border-bottom: 5px solid #002a17;
-        }
-
-        .report-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 0 0 10px 0;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        .meta-info {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Content Sections */
-        .section {
-            padding: 30px 25px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .section-title {
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #333; line-height: 1.6; }
+        .container { max-width: 720px; margin: 0 auto; background: var(--white); box-shadow: 0 0 20px rgba(0,0,0,0.05); min-height: 100vh; }
+        
+        /* === 아코디언 스타일 === */
+        .accordion-header {
+            background-color: #fff;
+            color: var(--secondary);
+            cursor: pointer;
+            padding: 20px 25px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
             font-size: 18px;
             font-weight: 700;
-            color: var(--secondary);
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary);
-            padding-left: 12px;
+            transition: 0.3s;
+            border-bottom: 1px solid #eee;
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
+        .accordion-header:hover { background-color: #f9f9f9; }
+        .accordion-header.active { border-bottom: none; background-color: #f1f3f5; }
+        .accordion-header::after { content: '▼'; font-size: 14px; color: #999; transition: transform 0.3s; }
+        .accordion-header.active::after { transform: rotate(180deg); }
 
-        .box {
-            background: #fdfdfd;
-            border: 1px solid #e1e1e1;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .box-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--secondary);
-            display: block;
-        }
-
-        .highlight {
-            background-color: #fff3cd;
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-weight: 700;
-        }
-
-        /* AS-IS Analysis Styles */
-        .problem-card {
-            background-color: #fff5f5;
-            border: 1px solid #ffcccc;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-        
-        .problem-tag {
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 12px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .img-container {
-            width: 100%;
-            margin: 15px 0;
-            border-radius: 8px;
+        .accordion-panel {
+            padding: 0 25px;
+            background-color: white;
+            max-height: 0;
             overflow: hidden;
-            border: 1px solid #ddd;
-            position: relative;
+            transition: max-height 0.3s ease-out;
+            border-bottom: 1px solid #eee;
         }
+        .accordion-panel.open { padding: 25px; border-bottom: 1px solid #eee; }
 
-        .img-container img {
-            width: 100%;
-            display: block;
-        }
-
-        .img-caption {
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-        }
-
-        /* Strategy Points */
-        .strategy-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .strategy-item {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: flex-start;
-        }
-
-        .number-badge {
-            background-color: var(--primary);
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-right: 12px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .strategy-content strong {
-            display: block;
-            margin-bottom: 4px;
-            color: #333;
-        }
-
-        .strategy-content p {
-            margin: 0;
-            font-size: 14px;
+        /* === 구분선 스타일 === */
+        .section-divider {
+            background-color: #f1f3f5;
+            padding: 15px 25px;
+            font-size: 13px;
+            font-weight: 700;
             color: #666;
+            border-bottom: 1px solid #ddd;
+            border-top: 1px solid #ddd;
         }
 
-        /* Expected Effect Chart (Visual) */
-        .effect-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .bar-label {
-            width: 60px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .bar-bg {
-            flex-grow: 1;
-            background: #eee;
-            height: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 1s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-        }
+        /* === 1부: 보고서 스타일 === */
+        header.report-header { background-color: var(--primary); color: white; padding: 40px 25px; border-bottom: 5px solid #002a17; }
+        .report-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; margin-bottom: 10px; letter-spacing: 1px; }
+        h1.report-title { font-size: 24px; margin: 0 0 10px 0; font-weight: 700; line-height: 1.3; }
+        .meta-info { font-size: 13px; opacity: 0.8; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; display: flex; justify-content: space-between; }
         
-        .bar-fill.asis { background: #95a5a6; width: 40%; }
-        .bar-fill.tobe { background: #e74c3c; width: 85%; }
+        .box { background: #fdfdfd; border: 1px solid #e1e1e1; padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        .box-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--secondary); display: block; }
+        .highlight { background-color: #fff3cd; padding: 2px 4px; border-radius: 2px; font-weight: 700; }
+        .problem-card { background-color: #fff5f5; border: 1px solid #ffcccc; padding: 15px; border-radius: 6px; margin-bottom: 10px; }
+        .problem-tag { color: var(--accent); font-weight: 700; font-size: 12px; margin-bottom: 5px; display: block; }
+        .img-container { width: 100%; margin: 15px 0; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; position: relative; }
+        .img-container img { width: 100%; display: block; }
+        .img-caption { background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; font-size: 12px; position: absolute; bottom: 0; left: 0; width: 100%; }
+        .strategy-list { list-style: none; padding: 0; }
+        .strategy-item { display: flex; margin-bottom: 15px; align-items: flex-start; }
+        .number-badge { background-color: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; margin-right: 12px; flex-shrink: 0; margin-top: 2px; }
 
-        /* Footer */
-        footer {
-            background: #eee;
-            text-align: center;
-            padding: 30px;
-            font-size: 12px;
-            color: #888;
-        }
+        /* === 2부: 설계도 스타일 === */
+        .wf-header-style { border-left: 5px solid #555; background-color: #fcfcfc; color: #333; }
+        
+        .wf-placeholder { background-color: var(--wf-bg); border: 2px dashed var(--wf-border); display: flex; justify-content: center; align-items: center; color: #666; font-weight: bold; text-align: center; padding: 20px; box-sizing: border-box; }
+        
+        .wf-note { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; font-size: 13px; margin: 15px 0; color: #0d47a1; line-height: 1.5; }
+        
+        /* 이미지 예시 스타일 */
+        .example-img { width: 100%; height: 350px; object-fit: cover; border-radius: 6px; border: 1px solid #eee; }
 
-        .btn-action {
-            display: block;
-            width: 100%;
-            padding: 15px 0;
-            background-color: var(--primary);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 700;
-            border-radius: 6px;
-            margin-top: 20px;
-        }
-
+        footer.wf-footer { background: #fff; padding: 15px; text-align: center; border-top: 1px solid #ddd; font-weight: bold; color: #999; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
+    <header class="report-header">
         <span class="report-badge">CONFIDENTIAL</span>
-        <h1>온라인 매출 증대를 위한<br>상세페이지 UX/UI 진단 보고</h1>
+        <h1 class="report-title">온라인 매출 증대를 위한<br>상세페이지 UX/UI 진단 보고</h1>
         <div class="meta-info">
-            <span>Subject: Seasonality & Readability</span>
+            <span>Subject: Seasonality Strategy</span>
             <span>Date: 2026. 01. 08</span>
         </div>
     </header>
 
-    <div class="section">
-        <div class="section-title">1. 요약 (Executive Summary)</div>
-        <p style="font-size: 15px; color: #444;">
-            현재 라코스테 '파워코트 & 카나비' 제품의 상세페이지는 <span class="highlight">1월(동절기)이라는 시점과 불일치하는 여름 착장</span>으로 인해 구매 전환율(CVR) 저하가 우려됨.<br><br>
-            이에 <strong>'시의성(Seasonality) 반영'</strong> 및 <strong>'모바일 가독성 개선'</strong>을 통해 이탈률을 방어하고 매출 반등을 꾀하고자 함.
+    <div class="section-divider">PART 1. 현황 진단 및 개선 전략</div>
+
+    <button class="accordion-header">1. 요약 (Executive Summary)</button>
+    <div class="accordion-panel">
+        <p style="font-size: 15px; color: #444; margin: 0;">
+            현재 라코스테 상세페이지는 <span class="highlight">접속 시점(동절기)과 불일치하는 여름 착장</span>으로 인해 구매 전환율(CVR) 저하가 우려됨. 이에 <strong>'시즌별 배너 수동 교체 운영'</strong>을 제안함.
         </p>
     </div>
 
-    <div class="section">
-        <div class="section-title">2. 현황 진단 및 문제점</div>
-        
+    <button class="accordion-header">2. 현황 진단 및 문제점 (AS-IS)</button>
+    <div class="accordion-panel">
         <div class="box">
             <span class="box-title">분석 대상 이미지</span>
             <div class="img-container">
                 <img src="sample.jpg" alt="상세페이지 분석 이미지">
                 <div class="img-caption">▲ 현재 운영 중인 상세페이지 (Summer Mood)</div>
             </div>
-            <p style="font-size: 12px; color: #888; margin-top: 5px;">* 이미지가 보이지 않을 경우 sample.jpg 파일명을 확인해주세요.</p>
         </div>
-
         <div class="problem-card">
-            <span class="problem-tag">🚨 Critical Issue 01</span>
-            <strong>계절감의 심각한 불일치</strong>
+            <span class="problem-tag">🚨 Critical Issue</span>
+            <strong>계절감의 심각한 불일치 (Seasonality Mismatch)</strong>
             <p style="font-size: 13px; margin-top: 5px;">
-                현재 영하의 날씨이나 모델은 <strong>반바지, 얇은 셔츠, 발목 양말</strong> 착용.<br>
-                고객에게 "지금 신기엔 춥다", "철 지난 재고 상품인가?"라는 부정적 인식을 심어주어 구매 욕구를 차단함.
-            </p>
-        </div>
-
-        <div class="problem-card">
-            <span class="problem-tag">⚠️ Critical Issue 02</span>
-            <strong>모바일 정보 전달력 부족</strong>
-            <p style="font-size: 13px; margin-top: 5px;">
-                제품 비교표(파워코트 vs 카나비)가 <strong>통이미지 내 작은 텍스트</strong>로 삽입됨.<br>
-                모바일 환경(매출의 80%)에서 가독성이 현저히 떨어져, 고객의 '결정 장애' 및 이탈을 유발.
+                1. 영하의 날씨에 여름 착장 노출로 고객의 구매 욕구 차단.<br><br>
+                <span style="color:#c0392b; font-weight:bold;">2. "관리가 안 되는 페이지인가?" 하는 고객 불신 초래</span><br>
+                : 시기에 맞지 않는 상세페이지 방치는 전반적인 쇼핑몰 운영 신뢰도에 부정적 영향을 끼침.
             </p>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">3. 개선 전략 (Action Plan)</div>
-        
-        <ul class="strategy-list">
+    <button class="accordion-header">3. 개선 전략 (Action Plan)</button>
+    <div class="accordion-panel">
+        <ul class="strategy-list" style="margin: 0;">
             <li class="strategy-item">
                 <div class="number-badge">1</div>
                 <div class="strategy-content">
-                    <strong>Visual: 계절감 중화 및 크롭(Crop)</strong>
-                    <p>반바지 등 여름 느낌이 강한 컷은 배제하거나 하단 배치.<br>
-                    신발 중심의 <strong>클로즈업(Close-up)</strong> 비중을 높여 소재의 퀄리티와 사계절 범용성을 강조.</p>
-                </div>
-            </li>
-            <li class="strategy-item">
-                <div class="number-badge">2</div>
-                <div class="strategy-content">
-                    <strong>Context: 겨울/졸업 시즌 키워드 매칭</strong>
-                    <p>카피라이팅 변경: "여름 스니커즈" → <strong>"새해 첫 시작을 위한 클래식"</strong>, "코트에도 어울리는 깔끔함" 등 현재 시점의 명분(Reason to buy) 부여.</p>
-                </div>
-            </li>
-            <li class="strategy-item">
-                <div class="number-badge">3</div>
-                <div class="strategy-content">
-                    <strong>UI: 비교 정보의 텍스트화</strong>
-                    <p>이미지 속 글씨를 제거하고, HTML 텍스트로 변환.<br>
-                    파워코트(헤리티지) vs 카나비(미니멀)의 차이를 <strong>체크리스트 형태</strong>로 직관적으로 제공.</p>
+                    <strong>Operation: 시즌별 배너 수동 교체 운영</strong>
+                    <p>운영팀에서 매월 시즌(계절)에 맞는 코디 이미지로 수동 교체하여 시의성 유지 및 고객 신뢰도 확보.</p>
                 </div>
             </li>
         </ul>
     </div>
 
-    <div class="section">
-        <div class="section-title">4. 기대 효과 (KPI)</div>
-        <p style="font-size: 14px; margin-bottom: 20px;">시즌 부적합 요소를 제거함으로써, 구매 결정 단계의 심리적 장벽 해소</p>
-        
-        <div class="effect-bar">
-            <div class="bar-label">AS-IS</div>
-            <div class="bar-bg">
-                <div class="bar-fill asis">이탈률 높음 (Seasonality 이슈)</div>
-            </div>
+
+    <div class="section-divider">PART 2. 개선안 설계도 (Wireframe)</div>
+
+    <button class="accordion-header wf-header-style">1. 메인 제품 영역 (이미지 교체 예시)</button>
+    <div class="accordion-panel">
+        <div class="wf-note">
+            🔔 <strong>운영 Tip (수동 운영):</strong> 매월 1일, 아래와 같이 시즌에 맞는 코디 이미지로 <strong>수동 교체</strong>를 권장합니다.
         </div>
-        <div class="effect-bar">
-            <div class="bar-label">TO-BE</div>
-            <div class="bar-bg">
-                <div class="bar-fill tobe">구매 전환율(CVR) 상승 예상</div>
+        
+        <div style="display: flex; justify-content: center;">
+            <div style="width: 100%; max-width: 400px;">
+                <img src="https://images.unsplash.com/photo-1544261480-1d892c2235e1?auto=format&fit=crop&w=800&q=80" class="example-img" alt="겨울 시즌 예시">
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>
-            Online Sales Division<br>
-            Product Analysis Team
-        </p>
-        <div style="margin-top: 10px; font-weight: bold; color: #333;">
-            End of Document
+    <button class="accordion-header wf-header-style">2. 시즌별 이미지 DB 구축 가이드</button>
+    <div class="accordion-panel">
+        <div class="wf-note">
+            🔔 <strong>DB 구축 요청:</strong> 원활한 교체를 위해 아래와 같이 3계절(봄/여름/겨울) 코디 사진을 미리 확보 바랍니다.
         </div>
-    </footer>
+        
+        <div style="margin-top: 20px;">
+            <img src="season_db.png" alt="시즌별 코디 DB 예시" style="width: 100%; border-radius: 8px; border: 1px solid #eee; display: block;">
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 10px; text-align: center; font-size: 13px; font-weight: 700; color: #004526; background: #f9f9f9; padding: 10px; border-radius: 6px;">
+                <div style="flex: 1; border-right: 1px solid #ddd;">🌸 봄(Spring)<br><span style="font-weight:400; font-size:12px; color:#666;">(가디건/데님)</span></div>
+                <div style="flex: 1; border-right: 1px solid #ddd;">☀️ 여름(Summer)<br><span style="font-weight:400; font-size:12px; color:#666;">(린넨 원피스)</span></div>
+                <div style="flex: 1;">❄️ 겨울(Winter)<br><span style="font-weight:400; font-size:12px; color:#666;">(롱패딩/목도리)</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="wf-footer">End of Document</footer>
 </div>
 
 <script>
-    // Simple animation for bars
-    window.onload = function() {
-        // Animation effects can be added here if needed
-        console.log("Report Loaded Successfully");
-    };
+    var acc = document.getElementsByClassName("accordion-header");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+                panel.classList.remove("open");
+            } else {
+                panel.classList.add("open");
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+        });
+    }
 </script>
 
 </body>

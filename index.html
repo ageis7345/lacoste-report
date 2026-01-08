@@ -80,7 +80,13 @@
         .wf-header-style { border-left: 5px solid #555; background-color: #fcfcfc; color: #333; }
         
         .wf-note { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; font-size: 13px; margin: 15px 0; color: #0d47a1; line-height: 1.5; }
-        
+
+        /* 비디오 그리드 스타일 (추가됨) */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 15px; }
+        .video-container { position: relative; padding-bottom: 56.25%; /* 16:9 비율 */ height: 0; overflow: hidden; border-radius: 8px; border: 1px solid #eee; background: #000; }
+        .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .video-label { font-size: 13px; font-weight: 700; color: var(--primary); margin-top: 8px; text-align: center; }
+
         footer.wf-footer { background: #fff; padding: 15px; text-align: center; border-top: 1px solid #ddd; font-weight: bold; color: #999; font-size: 12px; }
     </style>
 </head>
@@ -139,13 +145,11 @@
     </div>
 
 
-    <div class="section-divider">PART 2. 개선안 설계도 (Wireframe)</div>
-
     <button class="accordion-header wf-header-style">1. 시즌별 배너 운영 및 DB 구축 가이드</button>
     <div class="accordion-panel">
         <div class="wf-note">
             🔔 <strong>운영 Tip (수동 운영):</strong> 매월 1일, 아래 DB를 활용하여 시즌에 맞는 코디 이미지로 <strong>수동 교체</strong>를 권장합니다.<br><br>
-            🔔 <strong>DB 구축 요청:</strong> 원활한 교체를 위해 아래와 같이 3계절(봄/여름/겨울) 코디 사진을 미리 확보 바랍니다.
+            🔔 <strong>DB 구축 요청:</strong> 원활한 교체를 위해 아래와 같이 3계절(봄/여름/겨울) 코디 사진 및 참고 영상을 미리 확보 바랍니다.
         </div>
         
         <div style="margin-top: 20px;">
@@ -155,6 +159,32 @@
                 <div style="flex: 1; border-right: 1px solid #ddd;">🌸 봄(Spring)<br><span style="font-weight:400; font-size:12px; color:#666;">(가디건/데님)</span></div>
                 <div style="flex: 1; border-right: 1px solid #ddd;">☀️ 여름(Summer)<br><span style="font-weight:400; font-size:12px; color:#666;">(린넨 원피스)</span></div>
                 <div style="flex: 1;">❄️ 겨울(Winter)<br><span style="font-weight:400; font-size:12px; color:#666;">(롱패딩/목도리)</span></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee;">
+            <div style="font-size: 15px; font-weight: 700; color: #333; margin-bottom: 15px;">🎥 기타 참고 영상 (Video Reference)</div>
+            
+            <div class="video-grid">
+                <div>
+                    <div class="video-container">
+                        <video autoplay muted loop playsinline>
+                            <source src="video1.mp4" type="video/mp4">
+                            브라우저가 비디오를 지원하지 않습니다.
+                        </video>
+                    </div>
+                    <div class="video-label">참고 영상 1 (Reference Video 1)</div>
+                </div>
+                
+                <div>
+                    <div class="video-container">
+                        <video autoplay muted loop playsinline>
+                            <source src="video2.mp4" type="video/mp4">
+                            브라우저가 비디오를 지원하지 않습니다.
+                        </video>
+                    </div>
+                    <div class="video-label">참고 영상 2 (Reference Video 2)</div>
+                </div>
             </div>
         </div>
     </div>
@@ -175,7 +205,8 @@
                 panel.classList.remove("open");
             } else {
                 panel.classList.add("open");
-                panel.style.maxHeight = panel.scrollHeight + "px";
+                // 비디오가 포함된 패널은 높이 계산이 부정확할 수 있어서 넉넉하게 줌
+                panel.style.maxHeight = (panel.scrollHeight + 200) + "px";
             } 
         });
     }
